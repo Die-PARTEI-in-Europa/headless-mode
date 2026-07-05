@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Headless WordPress Manager
+ * Plugin Name:       parteieuropa.eu - Headless WordPress Manager
  * Plugin URI:        https://github.com/Die-PARTEI-in-Europa/headless-wp-plugin
  * Description:       Turns WordPress into a headless CMS: disables the front end, points every "view" link at your decoupled front end, and exposes a signed preview endpoint. Configurable, no hard-coded URLs. Pairs with the parteieuropa/wordpress-api PHP SDK.
  * Version:           1.0.0

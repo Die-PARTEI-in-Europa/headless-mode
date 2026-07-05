@@ -1,4 +1,4 @@
-=== Headless WordPress Manager ===
+=== parteieuropa.eu - Headless WordPress Manager ===
 Contributors: parteieuropa
 Tags: headless, rest api, decoupled, preview, gutenberg
 Requires at least: 5.8
