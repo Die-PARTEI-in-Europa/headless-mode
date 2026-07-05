@@ -1,0 +1,6 @@
+# Nicht ins Repo / nicht ins Plugin-ZIP
+deploy.sh
+*.zip
+*.log
+.DS_Store
+node_modules/

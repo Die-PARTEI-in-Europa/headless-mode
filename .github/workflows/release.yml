@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish plugin ZIP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint PHP
+        run: |
+          for f in $(find . -name '*.php' -not -path './build/*'); do
+            php -l "$f"
+          done
+
+      - name: Build plugin ZIP
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "Building headless-wp-plugin ${VERSION}"
+          mkdir -p build/headless-wp-plugin
+          rsync -a \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude '.gitignore' \
+            --exclude 'deploy.sh' \
+            --exclude '*.zip' \
+            --exclude 'build' \
+            ./ build/headless-wp-plugin/
+          ( cd build && zip -rq "../headless-wp-plugin-${VERSION}.zip" headless-wp-plugin )
+          unzip -l "headless-wp-plugin-${VERSION}.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: headless-wp-plugin-*.zip
+          generate_release_notes: true
