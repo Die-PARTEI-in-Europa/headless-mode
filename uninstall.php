@@ -2,7 +2,7 @@
 /**
  * Uninstall handler: remove plugin data.
  *
- * @package Headless_WP_Manager
+ * @package Headless_Mode
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {

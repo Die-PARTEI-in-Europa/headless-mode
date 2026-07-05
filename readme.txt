@@ -1,8 +1,8 @@
-=== parteieuropa.eu - Headless WordPress Manager ===
+=== parteieuropa.eu - Headless Mode ===
 Contributors: parteieuropa
 Tags: headless, rest api, decoupled, preview, gutenberg
 Requires at least: 5.8
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -12,7 +12,7 @@ Turn WordPress into a headless CMS: disable the front end, rewrite every view li
 
 == Description ==
 
-Headless WordPress Manager makes it comfortable to run WordPress as a pure content back end behind a decoupled front end (React, Vue, Next, Symfony …). It keeps the editor experience intact while making sure every "view" leads to your real site, not the disabled theme.
+Headless Mode makes it comfortable to run WordPress as a pure content back end behind a decoupled front end (React, Vue, Next, Symfony …). It keeps the editor experience intact while making sure every "view" leads to your real site, not the disabled theme.
 
 Everything is configurable from **Settings → Headless WP** — there are no hard-coded URLs or post types.
 
@@ -37,7 +37,7 @@ This plugin pairs with the **[parteieuropa/wordpress-api](https://github.com/Die
 
 == Installation ==
 
-1. Upload the `headless-wp-plugin` folder to `/wp-content/plugins/`, or install it through the Plugins screen.
+1. Upload the `headless-mode` folder to `/wp-content/plugins/`, or install it through the Plugins screen.
 2. Activate the plugin.
 3. Go to **Settings → Headless WP**, enter your front-end URL and enable the features you need.
 

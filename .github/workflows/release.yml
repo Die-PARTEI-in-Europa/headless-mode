@@ -25,8 +25,8 @@ jobs:
       - name: Build plugin ZIP
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          echo "Building headless-wp-plugin ${VERSION}"
-          mkdir -p build/headless-wp-plugin
+          echo "Building headless-mode ${VERSION}"
+          mkdir -p build/headless-mode
           rsync -a \
             --exclude '.git' \
             --exclude '.github' \
@@ -34,12 +34,12 @@ jobs:
             --exclude 'deploy.sh' \
             --exclude '*.zip' \
             --exclude 'build' \
-            ./ build/headless-wp-plugin/
-          ( cd build && zip -rq "../headless-wp-plugin-${VERSION}.zip" headless-wp-plugin )
-          unzip -l "headless-wp-plugin-${VERSION}.zip"
+            ./ build/headless-mode/
+          ( cd build && zip -rq "../headless-mode-${VERSION}.zip" headless-mode )
+          unzip -l "headless-mode-${VERSION}.zip"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: headless-wp-plugin-*.zip
+          files: headless-mode-*.zip
           generate_release_notes: true

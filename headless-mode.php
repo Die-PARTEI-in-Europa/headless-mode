@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:       parteieuropa.eu - Headless WordPress Manager
- * Plugin URI:        https://github.com/Die-PARTEI-in-Europa/headless-wp-plugin
+ * Plugin Name:       parteieuropa.eu - Headless Mode
+ * Plugin URI:        https://github.com/Die-PARTEI-in-Europa/headless-mode
  * Description:       Turns WordPress into a headless CMS: disables the front end, points every "view" link at your decoupled front end, and exposes a signed preview endpoint. Configurable, no hard-coded URLs. Pairs with the parteieuropa/wordpress-api PHP SDK.
  * Version:           1.0.0
  * Requires at least: 5.8
@@ -10,26 +10,26 @@
  * Author URI:        https://parteieuropa.eu
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       headless-wp-plugin
+ * Text Domain:       headless-mode
  * Domain Path:       /languages
  *
- * @package Headless_WP_Manager
+ * @package Headless_Mode
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! defined( 'HEADLESS_WP_VERSION' ) ) {
-	define( 'HEADLESS_WP_VERSION', '1.0.0' );
+if ( ! defined( 'HEADLESS_MODE_VERSION' ) ) {
+	define( 'HEADLESS_MODE_VERSION', '1.0.0' );
 }
 
-if ( ! class_exists( 'Headless_WP_Manager' ) ) :
+if ( ! class_exists( 'Headless_Mode' ) ) :
 
 	/**
 	 * Core plugin class.
 	 */
-	class Headless_WP_Manager {
+	class Headless_Mode {
 
 		/**
 		 * Option key holding all plugin settings.
@@ -63,8 +63,6 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 		 * Register hooks based on the enabled features.
 		 */
 		public function __construct() {
-			add_action( 'init', array( $this, 'load_textdomain' ) );
-
 			// Settings screen is always available.
 			add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 			add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -98,13 +96,6 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 			if ( $s['no_rest_cache'] ) {
 				add_filter( 'rest_post_dispatch', array( $this, 'prevent_pages_rest_cache' ), 10, 3 );
 			}
-		}
-
-		/**
-		 * Load translations.
-		 */
-		public function load_textdomain() {
-			load_plugin_textdomain( 'headless-wp-plugin', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 		}
 
 		/**
@@ -183,8 +174,9 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 			}
 
 			// Logged-in preview → redirect to the decoupled front end with a token.
-			if ( is_user_logged_in() && isset( $_GET['preview'], $_GET['p'] ) ) {
-				$post_id = intval( $_GET['p'] );
+			// WordPress-generated preview links; no nonce is involved.
+			if ( is_user_logged_in() && isset( $_GET['preview'], $_GET['p'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$post_id = intval( $_GET['p'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$token   = $this->make_preview_token( $post_id, get_current_user_id() );
 				wp_safe_redirect( $this->preview_url( $token ) );
 				exit;
@@ -195,13 +187,13 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 				wp_kses_post(
 					sprintf(
 						'<h1>%1$s</h1><p>%2$s <a href="%3$s">%4$s</a></p>',
-						esc_html__( 'Front end disabled', 'headless-wp-plugin' ),
-						esc_html__( 'This WordPress site runs in headless mode. The front end is available at', 'headless-wp-plugin' ),
+						esc_html__( 'Front end disabled', 'headless-mode' ),
+						esc_html__( 'This WordPress site runs in headless mode. The front end is available at', 'headless-mode' ),
 						esc_url( $url ),
 						esc_html( $url )
 					)
 				),
-				esc_html__( 'Front end disabled', 'headless-wp-plugin' ),
+				esc_html__( 'Front end disabled', 'headless-mode' ),
 				array( 'response' => 404 )
 			);
 		}
@@ -225,8 +217,8 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 		 */
 		public function add_settings_page() {
 			add_options_page(
-				__( 'Headless WordPress', 'headless-wp-plugin' ),
-				__( 'Headless WP', 'headless-wp-plugin' ),
+				__( 'Headless WordPress', 'headless-mode' ),
+				__( 'Headless WP', 'headless-mode' ),
 				'manage_options',
 				'headless-wp-settings',
 				array( $this, 'render_settings_page' )
@@ -311,34 +303,34 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 				<form action="options.php" method="post">
 					<?php settings_fields( self::GROUP ); ?>
 
-					<h2><?php echo esc_html__( 'URLs', 'headless-wp-plugin' ); ?></h2>
+					<h2><?php echo esc_html__( 'URLs', 'headless-mode' ); ?></h2>
 					<table class="form-table" role="presentation">
 						<tr>
-							<th scope="row"><label for="hw_frontend_url"><?php echo esc_html__( 'Front-end URL', 'headless-wp-plugin' ); ?></label></th>
+							<th scope="row"><label for="hw_frontend_url"><?php echo esc_html__( 'Front-end URL', 'headless-mode' ); ?></label></th>
 							<td>
 								<input type="url" id="hw_frontend_url" name="<?php echo esc_attr( $o ); ?>[frontend_url]" value="<?php echo esc_attr( $s['frontend_url'] ); ?>" class="regular-text" placeholder="https://example.com">
-								<p class="description"><?php echo esc_html__( 'Base URL of your decoupled front end, without a trailing slash.', 'headless-wp-plugin' ); ?></p>
+								<p class="description"><?php echo esc_html__( 'Base URL of your decoupled front end, without a trailing slash.', 'headless-mode' ); ?></p>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><label for="hw_post_prefix"><?php echo esc_html__( 'Post path prefix', 'headless-wp-plugin' ); ?></label></th>
+							<th scope="row"><label for="hw_post_prefix"><?php echo esc_html__( 'Post path prefix', 'headless-mode' ); ?></label></th>
 							<td>
 								<input type="text" id="hw_post_prefix" name="<?php echo esc_attr( $o ); ?>[post_prefix]" value="<?php echo esc_attr( $s['post_prefix'] ); ?>" class="regular-text" placeholder="e.g. blog">
-								<p class="description"><?php echo esc_html__( 'Optional path segment prepended to single posts on the front end (e.g. "blog" → /blog/my-post). Leave empty for /my-post.', 'headless-wp-plugin' ); ?></p>
+								<p class="description"><?php echo esc_html__( 'Optional path segment prepended to single posts on the front end (e.g. "blog" → /blog/my-post). Leave empty for /my-post.', 'headless-mode' ); ?></p>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><label for="hw_preview_path"><?php echo esc_html__( 'Preview path', 'headless-wp-plugin' ); ?></label></th>
+							<th scope="row"><label for="hw_preview_path"><?php echo esc_html__( 'Preview path', 'headless-mode' ); ?></label></th>
 							<td>
 								<input type="text" id="hw_preview_path" name="<?php echo esc_attr( $o ); ?>[preview_path]" value="<?php echo esc_attr( $s['preview_path'] ); ?>" class="regular-text" placeholder="preview">
 								<p class="description">
-									<?php echo esc_html__( 'Front-end route that renders a preview. The resulting preview URL is:', 'headless-wp-plugin' ); ?>
+									<?php echo esc_html__( 'Front-end route that renders a preview. The resulting preview URL is:', 'headless-mode' ); ?>
 									<code><?php echo esc_html( $this->preview_url( '<token>' ) ); ?></code>
 								</p>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><label for="hw_raw_post_types"><?php echo esc_html__( 'Raw HTML post types', 'headless-wp-plugin' ); ?></label></th>
+							<th scope="row"><label for="hw_raw_post_types"><?php echo esc_html__( 'Raw HTML post types', 'headless-mode' ); ?></label></th>
 							<td>
 								<?php $selected_raw = (array) $s['raw_post_types']; ?>
 								<select id="hw_raw_post_types" name="<?php echo esc_attr( $o ); ?>[raw_post_types][]" multiple size="5" style="min-width:280px;">
@@ -348,20 +340,20 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 										</option>
 									<?php endforeach; ?>
 								</select>
-								<p class="description"><?php echo esc_html__( 'Select post types whose preview should return raw stored HTML instead of running the block renderer and wpautop. Hold Ctrl/Cmd to select multiple.', 'headless-wp-plugin' ); ?></p>
+								<p class="description"><?php echo esc_html__( 'Select post types whose preview should return raw stored HTML instead of running the block renderer and wpautop. Hold Ctrl/Cmd to select multiple.', 'headless-mode' ); ?></p>
 							</td>
 						</tr>
 					</table>
 
-					<h2><?php echo esc_html__( 'Features', 'headless-wp-plugin' ); ?></h2>
+					<h2><?php echo esc_html__( 'Features', 'headless-mode' ); ?></h2>
 					<table class="form-table" role="presentation">
 						<?php
-						$this->checkbox_row( $s, 'disable_frontend', __( 'Disable front end', 'headless-wp-plugin' ), __( 'Block all theme front-end requests and run in headless mode.', 'headless-wp-plugin' ) );
-						$this->checkbox_row( $s, 'rewrite_links', __( 'Rewrite view links', 'headless-wp-plugin' ), __( 'Point "View", permalink and preview links in the admin at the front end.', 'headless-wp-plugin' ) );
-						$this->checkbox_row( $s, 'preview_endpoint', __( 'Preview REST endpoint', 'headless-wp-plugin' ), __( 'Expose GET /wp-json/headless/v1/preview for token-based previews.', 'headless-wp-plugin' ) );
-						$this->checkbox_row( $s, 'admin_columns', __( 'Front-end URL column', 'headless-wp-plugin' ), __( 'Add a Frontend URL column to post-type list tables.', 'headless-wp-plugin' ) );
-						$this->checkbox_row( $s, 'metabox', __( 'Front-end URL meta box', 'headless-wp-plugin' ), __( 'Show the front-end URL in a meta box in the editor.', 'headless-wp-plugin' ) );
-						$this->checkbox_row( $s, 'no_rest_cache', __( 'Disable page REST cache', 'headless-wp-plugin' ), __( 'Send no-cache headers for /wp/v2/pages so stale block output is never served.', 'headless-wp-plugin' ) );
+						$this->checkbox_row( $s, 'disable_frontend', __( 'Disable front end', 'headless-mode' ), __( 'Block all theme front-end requests and run in headless mode.', 'headless-mode' ) );
+						$this->checkbox_row( $s, 'rewrite_links', __( 'Rewrite view links', 'headless-mode' ), __( 'Point "View", permalink and preview links in the admin at the front end.', 'headless-mode' ) );
+						$this->checkbox_row( $s, 'preview_endpoint', __( 'Preview REST endpoint', 'headless-mode' ), __( 'Expose GET /wp-json/headless/v1/preview for token-based previews.', 'headless-mode' ) );
+						$this->checkbox_row( $s, 'admin_columns', __( 'Front-end URL column', 'headless-mode' ), __( 'Add a Frontend URL column to post-type list tables.', 'headless-mode' ) );
+						$this->checkbox_row( $s, 'metabox', __( 'Front-end URL meta box', 'headless-mode' ), __( 'Show the front-end URL in a meta box in the editor.', 'headless-mode' ) );
+						$this->checkbox_row( $s, 'no_rest_cache', __( 'Disable page REST cache', 'headless-mode' ), __( 'Send no-cache headers for /wp/v2/pages so stale block output is never served.', 'headless-mode' ) );
 						?>
 					</table>
 
@@ -369,7 +361,7 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 				</form>
 
 				<hr>
-				<h2><?php echo esc_html__( 'REST API endpoints', 'headless-wp-plugin' ); ?></h2>
+				<h2><?php echo esc_html__( 'REST API endpoints', 'headless-mode' ); ?></h2>
 				<ul>
 					<li><strong>Posts:</strong> <code><?php echo esc_url( rest_url( 'wp/v2/posts' ) ); ?></code></li>
 					<li><strong>Pages:</strong> <code><?php echo esc_url( rest_url( 'wp/v2/pages' ) ); ?></code></li>
@@ -380,7 +372,7 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 					<?php
 					printf(
 						/* translators: %s: link to the PHP SDK on GitHub. */
-						esc_html__( 'Tip: consume this API from PHP with the %s SDK.', 'headless-wp-plugin' ),
+						esc_html__( 'Tip: consume this API from PHP with the %s SDK.', 'headless-mode' ),
 						'<a href="https://github.com/Die-PARTEI-in-Europa/wordpress-api" target="_blank" rel="noopener">parteieuropa/wordpress-api</a>'
 					);
 					?>
@@ -450,7 +442,7 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 			foreach ( $columns as $key => $value ) {
 				$new[ $key ] = $value;
 				if ( 'title' === $key ) {
-					$new['frontend_url'] = __( 'Frontend URL', 'headless-wp-plugin' );
+					$new['frontend_url'] = __( 'Frontend URL', 'headless-mode' );
 				}
 			}
 			return $new;
@@ -481,7 +473,7 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 			foreach ( get_post_types( array( 'public' => true ), 'names' ) as $post_type ) {
 				add_meta_box(
 					'headless_wp_frontend_url',
-					__( 'Frontend URL', 'headless-wp-plugin' ),
+					__( 'Frontend URL', 'headless-mode' ),
 					array( $this, 'render_frontend_url_metabox' ),
 					$post_type,
 					'side',
@@ -499,7 +491,7 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 			$url = $this->get_frontend_url( $post->ID );
 			?>
 			<div style="padding:10px 0;">
-				<p style="margin:0 0 10px;"><?php echo esc_html__( 'This entry is available on the front end at:', 'headless-wp-plugin' ); ?></p>
+				<p style="margin:0 0 10px;"><?php echo esc_html__( 'This entry is available on the front end at:', 'headless-mode' ); ?></p>
 				<div style="background:#f0f0f1;padding:12px;border-radius:4px;margin-bottom:10px;">
 					<a href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener" style="color:#2271b1;text-decoration:none;font-weight:500;word-break:break-all;">
 						<span class="dashicons dashicons-external" style="vertical-align:middle;"></span>
@@ -616,7 +608,7 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 				$content = $base_post->post_content;
 			} else {
 				$content = do_blocks( $source->post_content );
-				$content = apply_filters( 'the_content', $content );
+				$content = apply_filters( 'the_content', $content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- applying core filter intentionally.
 			}
 
 			return rest_ensure_response(
@@ -676,6 +668,6 @@ if ( ! class_exists( 'Headless_WP_Manager' ) ) :
 		}
 	}
 
-	new Headless_WP_Manager();
+	new Headless_Mode();
 
 endif;
