@@ -39,7 +39,10 @@ jobs:
           unzip -l "headless-mode-${VERSION}.zip"
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: headless-mode-*.zip
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            headless-mode-*.zip \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "parteieuropa.eu - Headless Mode ${GITHUB_REF_NAME}. See readme.txt for the changelog."
